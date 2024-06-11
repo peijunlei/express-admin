@@ -10,6 +10,7 @@ exports.createOne = Model => catchAsync(async (req, res) => {
   res.success(data)
 })
 exports.getAll = (Model, options) => catchAsync(async (req, res) => {
+  console.log('req.user===>', req.user)
   let filter = {}
   if (req.params.tourId) {
     filter = { tour: req.params.tourId }
@@ -51,5 +52,5 @@ exports.deleteOne = Model => catchAsync(async (req, res, next) => {
   if (!doc) {
     return next(new AppError(Const.RESOURCE_NOT_FOUND))
   }
-  res.success(null, null, 204)
+  res.success(null)
 })

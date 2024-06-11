@@ -1,12 +1,15 @@
 const express = require('express')
 const router = express.Router()
-const { getAllMenus, createMenu } = require('../controllers/menu-controller')
-
+const { getAllMenus, getMenu, createMenu, updateMenu } = require('../controllers/menu-controller')
+const { authGuard } = require('../middleware/auth-middleware')
 
 
 router
   .route('/')
-  .get(getAllMenus)
+  .get(authGuard, getAllMenus)
   .post(createMenu)
-
+router
+  .route('/:id')
+  .get(authGuard, getMenu)
+  .put(updateMenu)
 module.exports = router

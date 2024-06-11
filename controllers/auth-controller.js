@@ -62,10 +62,10 @@ exports.register = catchAsync(async (req, res) => {
   const user = new User({
     phone: req.body.phone,
     email: req.body.email,
-    age: req.body.age,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   })
+  console.log('user', user)
   const data = await User.create(user)
   res.success(data)
 })

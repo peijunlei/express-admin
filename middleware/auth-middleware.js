@@ -32,9 +32,9 @@ exports.authGuard = catchAsync(async (req, res, next) => {
 // auth role admin
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return next(new AppError(Const.FORBIDDEN_MSG, Const.FORBIDDEN_CODE));
-    }
+    // if (!roles.includes(req.user.role)) {
+    //   return next(new AppError(Const.FORBIDDEN_MSG, Const.FORBIDDEN_CODE));
+    // }
     next();
   }
 }
@@ -46,9 +46,9 @@ exports.isSelf = (req, res, next) => {
   const _id = req.user._id.toString()
   const isAdmin = req.user.role === 'admin'
 
-  if (!isAdmin && _id !== id) {
-    return next(new AppError(Const.FORBIDDEN_MSG, Const.FORBIDDEN_CODE));
-  }
+  // if (!isAdmin && _id !== id) {
+  //   return next(new AppError(Const.FORBIDDEN_MSG, Const.FORBIDDEN_CODE));
+  // }
   next()
 }
 

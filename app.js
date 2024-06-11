@@ -15,6 +15,7 @@ const userRouter = require('./routes/user');
 const tourRouter = require('./routes/tour');
 const reviewRouter = require('./routes/review');
 const menuRouter = require('./routes/menu');
+const roleRouter = require('./routes/role');
 // 安全中间件
 app.use(helmet());
 // 限制请求次数
@@ -45,6 +46,8 @@ app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/reviews', reviewRouter)
 // 菜单路由
 app.use('/api/v1/menus', menuRouter)
+// 角色路由
+app.use('/api/v1/roles', roleRouter)
 // 处理未定义路由
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl}`, Const.ERROR_CODE, 404))

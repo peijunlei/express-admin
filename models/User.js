@@ -25,28 +25,23 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true],
+    required: [true, '邮箱不能为空'],
     unique: true,
     validate: [validator.isEmail, '邮箱格式不正确']
+  },
+  status: {
+    type: Number,
+    enum:{
+      values: [0,1], // 0: 禁用 1: 启用
+      message: '状态参数不正确'
+    },  
+    default: 1,
   },
   age: {
     type: Number,
     default: null,
   },
-  role: {
-    type: String,
-    enum: {
-      values: ['user', 'admin'],
-      message: 'admin角色只能是 admin 或 user'
-    },
-    validate: {
-      validator: function (val) {
-        return val === 'user'
-      },
-      message: 'admin角色不可注册'
-    },
-    default: 'user'
-  },
+  roleIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }], // 角色拥有的权限
   password: {
     type: String,
     required: [true, '密码不能为空'],

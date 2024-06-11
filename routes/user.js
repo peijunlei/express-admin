@@ -23,7 +23,7 @@ router
 router
   .route('/:id')
   .get(authGuard, isSelf, getUser)
-  .patch(
+  .put(
     authGuard,
     isSelf,
     // req.body过滤掉role，password，passwordConfirm 三个字段
