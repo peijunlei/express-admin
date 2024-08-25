@@ -6,11 +6,12 @@ const catchAsync = require('../utils/catchAsync')
 const factory = require('./handlerFactory')
 
 
-exports.getAllUsers = factory.getAll(User,{active:{ $ne: false }})
+exports.getAllUsers = factory.getAll(User)
 exports.getUser = factory.getOne(User)
 exports.updateUser = factory.updateOne(User)
 exports.deleteUser = catchAsync(async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.params.id, { active: false })
+  // 逻辑删除
+  const user = await User.findByIdAndUpdate(req.params.id, { delflag: 1 })
   // 查询不到 id 不会报错，需要手动抛出错误
   if (!user) throw new AppError(Const.RESOURCE_NOT_FOUND)
   res.success(null)

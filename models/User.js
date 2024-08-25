@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     unique: true,
-    sparse: true, // 使得 null 值不会被重复
+    sparse: true, // 使得 null 值不会被重复 稀疏索引
     default: null,
     validate: {
       validator: function (val) {
@@ -29,19 +29,18 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: [validator.isEmail, '邮箱格式不正确']
   },
-  status: {
+  delflag: {
     type: Number,
     enum:{
-      values: [0,1], // 0: 禁用 1: 启用
-      message: '状态参数不正确'
+      values: [0,1], // 0 未删除 1 已删除
     },  
-    default: 1,
+    default: 0
   },
   age: {
     type: Number,
     default: null,
   },
-  roleIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }], // 角色拥有的权限
+  roleIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }], // 用户的角色
   password: {
     type: String,
     required: [true, '密码不能为空'],
@@ -67,11 +66,6 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  active: {
-    type: Boolean,
-    default: true,
-    select: false // 默认不显示
-  }
 })
 userSchema.set('toJSON', {
   virtuals: true,
@@ -87,9 +81,15 @@ userSchema.set('toJSON', {
 // userSchema.virtual('id').get(function () {
 //   return this._id.toHexString();
 // })
+// 定义虚拟字段 roles
+// userSchema.virtual('roles', {
+//   ref: 'Role',
+//   localField: 'roleIds',
+//   foreignField: '_id',
+//   justOne: false, // 是否只填充单个文档
+//   options: { select: 'id name' }
+// });
 userSchema.pre(/^find/, async function (next) {
-  // $ne 不等于
-  this.find({ active: { $ne: false } })
   next()
 })
 // save 之前执行

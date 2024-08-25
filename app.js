@@ -20,7 +20,7 @@ const roleRouter = require('./routes/role');
 app.use(helmet());
 // 限制请求次数
 const limiter = limit({
-  max: 100, // 最大请求次数
+  max: 10000, // 最大请求次数
   windowMs: 60 * 60 * 1000,// 1小时
   message: Const.LIMIT_ERROR// 错误信息
 })

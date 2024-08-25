@@ -14,10 +14,10 @@ mongoose.connect(DB, {
   dbName,
 }).then(async () => {
   console.log('MongoDB connection successful')
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  })
 }).catch(err => {
   console.log('MongoDB connection failed', err)
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})

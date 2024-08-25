@@ -43,8 +43,9 @@ module.exports = (err, req, res, next) => {
   }
   if (err.code === 11000) {
     // 获取重复的字段和值
-    console.log('1212',err)
+    console.log('字段重复',err)
     const duplicatedField = Object.keys(err.keyPattern)[0];
+    console.log('duplicatedField:', duplicatedField )
     const duplicatedValue = err.keyValue[duplicatedField];
     message = `${duplicatedField}:${duplicatedValue}已存在`
   }

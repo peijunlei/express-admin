@@ -4,17 +4,19 @@ const AppError = require('../utils/app-error')
 const Const = require('../constant')
 const APIFeatures = require('../utils/api-features')
 
-
+/**
+ * 查询 delflag 为 0 即未删除的数据
+ */
+const queryDelflag = {
+  delflag: 0
+}
 exports.createOne = Model => catchAsync(async (req, res) => {
-  const data = await Model.create({...req.body})
+  const data = await Model.create({ ...req.body })
   res.success(data)
 })
 exports.getAll = (Model, options) => catchAsync(async (req, res) => {
-  console.log('req.user===>', req.user)
-  let filter = {}
-  if (req.params.tourId) {
-    filter = { tour: req.params.tourId }
-  }
+  // console.log('req.user===>', req.user)
+  let filter = queryDelflag
   const feature = new APIFeatures(Model.find(filter), req.query)
     .filter()
     .sort()
@@ -30,6 +32,16 @@ exports.getAll = (Model, options) => catchAsync(async (req, res) => {
     total
   }
   res.success(result)
+})
+// 无分页查询所有
+exports.getAllNoPage = Model => catchAsync(async (req, res) => {
+  // 查询所有未删除的数据
+  const list = await Model.find(queryDelflag)
+  const total = await Model.countDocuments(queryDelflag)
+  res.success({
+    list,
+    total
+  })
 })
 exports.getOne = (Model, popOptions) => catchAsync(async (req, res, next) => {
   let query = Model.findById(req.params.id)
@@ -49,6 +61,13 @@ exports.updateOne = Model => catchAsync(async (req, res, next) => {
 })
 exports.deleteOne = Model => catchAsync(async (req, res, next) => {
   const doc = await Model.findByIdAndDelete(req.params.id)
+  if (!doc) {
+    return next(new AppError(Const.RESOURCE_NOT_FOUND))
+  }
+  res.success(null)
+})
+exports.delOneByFlag = Model => catchAsync(async (req, res, next) => {
+  const doc = await Model.findByIdAndUpdate(req.params.id, { delflag: true })
   if (!doc) {
     return next(new AppError(Const.RESOURCE_NOT_FOUND))
   }

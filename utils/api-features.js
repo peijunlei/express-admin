@@ -28,7 +28,7 @@ class APIFeatures {
         queryObj[key] = { $regex: queryObj[key], $options: 'i' }
       }
     }
-    console.log('queryObj', queryObj)
+    // console.log('queryObj===>', queryObj)
     this.query = this.query.find(queryObj)
     return this
   }

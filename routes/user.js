@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { getAllUsers, getUser, deleteUser, updateUser, excludeBody } = require('../controllers/user-controller')
 const { register, sendCode,registerByCode, login, forgetPassword, resetPassword, updatePassword } = require('../controllers/auth-controller')
-const { authGuard, restrictTo, isSelf } = require('../middleware/auth-middleware')
+const { authGuard, restrictTo, isSelf ,validatePermission} = require('../middleware/auth-middleware')
 
 
 
@@ -19,7 +19,7 @@ router
 // router.use(authGuard)
 router
   .route('/')
-  .get(authGuard, restrictTo('admin'), getAllUsers)
+  .get(authGuard,validatePermission, restrictTo('admin'), getAllUsers)
 router
   .route('/:id')
   .get(authGuard, isSelf, getUser)

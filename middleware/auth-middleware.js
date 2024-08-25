@@ -3,6 +3,8 @@ const Const = require("../constant");
 const catchAsync = require("../utils/catchAsync");
 const { verifyJwtToken } = require("../utils/jwt");
 const User = require("../models/User");
+const Role = require("../models/Role");
+const Menu = require("../models/Menu");
 // auth
 exports.authGuard = catchAsync(async (req, res, next) => {
 
@@ -52,3 +54,19 @@ exports.isSelf = (req, res, next) => {
   next()
 }
 
+// validatePermission
+exports.validatePermission =async (req, res, next) => {
+  const user = req.user
+  console.log('user:', user)
+  const roleIds = user.roleIds.map(item => item.toString())
+  // 查询角色详情
+  const roles = await Role.find({ _id: { $in: roleIds } })
+  console.log('roles:', roles)
+  const allMenusIds = roles.reduce((pre, cur) => {
+    return pre.concat(cur.menus.map(item => item.toString()))
+  }, [])
+  console.log('allMenusIds:', allMenusIds)
+  const allMenus = await Menu.find({ _id: { $in: allMenusIds } })
+  console.log('allMenus:', allMenus)
+  next()
+}
