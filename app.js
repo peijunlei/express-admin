@@ -12,8 +12,6 @@ const AppError = require('./utils/app-error');
 const globalErrorHandler = require('./controllers/error-controller');
 const successResMiddleware = require('./middleware/success-response');
 const userRouter = require('./routes/user');
-const tourRouter = require('./routes/tour');
-const reviewRouter = require('./routes/review');
 const menuRouter = require('./routes/menu');
 const roleRouter = require('./routes/role');
 // 安全中间件
@@ -38,12 +36,9 @@ app.use(cors())
 
 // 处理成功响应
 app.use(successResMiddleware);
+
 // 用户路由
 app.use('/api/v1/users', userRouter)
-// 旅游路由
-app.use('/api/v1/tours', tourRouter)
-// 评论路由
-app.use('/api/v1/reviews', reviewRouter)
 // 菜单路由
 app.use('/api/v1/menus', menuRouter)
 // 角色路由

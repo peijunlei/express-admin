@@ -16,6 +16,12 @@ exports.deleteUser = catchAsync(async (req, res) => {
   if (!user) throw new AppError(Const.RESOURCE_NOT_FOUND)
   res.success(null)
 })
+// addUser
+exports.addUser = catchAsync(async (req, res) => {
+  const user = await User.create(req.body)
+  res.success(user)
+})
+
 exports.excludeBody = (...keys) => (req, res, next) => {
   const body = excludeObj(req.body, ...keys)
   req.body = body
