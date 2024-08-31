@@ -39,3 +39,19 @@ exports.getFunctionNames = catchAsync(async (req, res, next) => {
     total: menus.length
   })
 })
+
+// 交换菜单排序
+exports.exchangeOrder = catchAsync(async (req, res, next) => {
+  const { id, targetId } = req.body
+  const menu = await Menu.findById(id)
+  const targetMenu = await Menu.findById(targetId)
+  if (!menu || !targetMenu) {
+    return next(new AppError('菜单不存在', 400))
+  }
+  const tempOrder = menu.order
+  menu.order = targetMenu.order
+  targetMenu.order = tempOrder
+  await menu.save()
+  await targetMenu.save()
+  res.success()
+})

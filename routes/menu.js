@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const { getAllMenus,getPermissionMenus, getMenu, createMenu, updateMenu,deleteMenu } = require('../controllers/menu-controller')
-const { authGuard,validatePermission } = require('../middleware/auth-middleware')
+const { getAllMenus, getPermissionMenus, getMenu, createMenu, updateMenu, deleteMenu,exchangeOrder } = require('../controllers/menu-controller')
+const { authGuard, validatePermission } = require('../middleware/auth-middleware')
 
 
 router
@@ -14,4 +14,6 @@ router
   .get(authGuard, getMenu)
   .put(updateMenu)
   .delete(deleteMenu)
+router
+  .post('/exchangeOrder',exchangeOrder)
 module.exports = router
