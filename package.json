@@ -8,14 +8,14 @@
     "start": "cross-env NODE_ENV=production node server",
     "debug": "ndb server",
     "test": "dotenv -e .env",
-    "pkg": "pkg . --output dist"
+    "pkg": "pkg ."
   },
   "bin": "server.js",
   "pkg": {
-    "scripts": "server.js",
     "targets": [
-      "node16-linux-x64"
-    ]
+      "node18-linux-x64"
+    ],
+    "outputPath": "lib"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
