@@ -30,12 +30,21 @@ jobs:
       run: |
           yarn
           yarn pkg
-    - name: ssh deploy 💖
+    - name: upload lib to ecs 💖
       uses:  easingthemes/ssh-deploy@v5.0.0
       with:
           SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
           REMOTE_HOST: ${{secrets.REMOTE_HOST}}
           REMOTE_USER: root
           SOURCE: lib
-          TARGET: /root/data/express-start
+          TARGET: /root/data/express-admin
+    - name: executing remote ssh commands using ssh key
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+          host: ${{secrets.REMOTE_HOST}}
+          username: root
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          script: |
+              pm2 l
+              pm2 restart express-admin
       
