@@ -45,6 +45,7 @@ jobs:
           username: root
           key: ${{secrets.SSH_PRIVATE_KEY}}
           script: |
-              pm2 l
-              pm2 restart express-admin
+              pwd
+              #pm2 l
+              #pm2 restart express-admin
       
