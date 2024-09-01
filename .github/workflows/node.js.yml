@@ -37,5 +37,5 @@ jobs:
           REMOTE_HOST: ${{secrets.REMOTE_HOST}}
           REMOTE_USER: root
           SOURCE: lib
-          TARGET: /root/data/express-start/lib
+          TARGET: /root/data/express-start
       
