@@ -45,6 +45,11 @@ jobs:
           username: root
           key: ${{secrets.SSH_PRIVATE_KEY}}
           script: |
+              export NVM_DIR=~/.nvm
+              source ~/.nvm/nvm.sh
+              node -v
+              npm -v
+              pm2 -v
               pm2 ls
               pm2 restart express-admin
       
