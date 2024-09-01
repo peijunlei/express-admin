@@ -43,6 +43,11 @@ app.use('/api/v1/users', userRouter)
 app.use('/api/v1/menus', menuRouter)
 // 角色路由
 app.use('/api/v1/roles', roleRouter)
+app.use('/api/v1/test', (req, res) => {
+  res.json({
+    message: 'test success'
+  })
+})
 // 处理未定义路由
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl}`, Const.ERROR_CODE, 404))
