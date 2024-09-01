@@ -45,7 +45,7 @@ app.use('/api/v1/menus', menuRouter)
 app.use('/api/v1/roles', roleRouter)
 app.use('/api/v1/test', (req, res) => {
   res.json({
-    message: 'test success'
+    message: 'test success deploy'
   })
 })
 // 处理未定义路由
