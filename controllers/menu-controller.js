@@ -2,6 +2,7 @@
 const Const = require('../constant')
 const Menu = require('../models/Menu')
 const Role = require('../models/Role')
+const Func = require('../models/Func')
 const AppError = require('../utils/app-error')
 const catchAsync = require('../utils/catchAsync')
 const factory = require('./handlerFactory')
@@ -15,12 +16,21 @@ exports.getMenu = factory.getOne(Menu)
 exports.deleteMenu = factory.delOneByFlag(Menu)
 exports.getPermissionMenus = catchAsync(async (req, res, next) => {
   const { roleIds } = req.user
-  console.log('roleIds===>', roleIds)
-  const result = await Role.findById(roleIds[0]).populate('menus')
+  // 查找多个角色的权限菜单
+  const roles = await Role.find({ _id: { $in: roleIds } }).populate('menus');
+
+  // 合并所有角色的菜单
+  const allMenus = roles.reduce((acc, role) => {
+    return acc.concat(role.menus);
+  }, []);
+  // 去重，防止重复菜单
+  const uniqueMenuIds = Array.from(new Set(allMenus.map(menu => menu._id)))
+  const uniqueMenus = uniqueMenuIds
+    .map(id => allMenus.find(menu => menu._id.equals(id)));
   res.success({
-    list: result.menus,
-    total: result.menus.length
-  })
+    list: uniqueMenus,
+    total: uniqueMenus.length
+  });
 })
 exports.getFunctionNames = catchAsync(async (req, res, next) => {
   // 只查询 type 为  3 的数据 

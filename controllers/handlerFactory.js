@@ -15,7 +15,7 @@ exports.createOne = Model => catchAsync(async (req, res) => {
   res.success(data)
 })
 exports.getAll = (Model, options) => catchAsync(async (req, res) => {
-  console.log('req.user===>', req.query)
+  console.log('common query===>', req.query)
   let filter = queryDelflag
   const feature = new APIFeatures(Model.find(filter), req.query)
     .filter()

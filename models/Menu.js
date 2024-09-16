@@ -11,7 +11,7 @@ const menuSchema = new mongoose.Schema({
   }, // 菜单项路由
   parentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Menu', default: null }, // 父节点ID，默认值为null表示根节点
   icon: { type: String, default: null }, // 菜单项图标
-  type: { type: Number, required: true }, // 菜单项类型，例如 0 表示目录，1 表示菜单项 2 表示按钮
+  type: { type: Number, required: true }, // 菜单项类型
   order: { type: Number, required: true }, // 菜单项排序
   hide: { type: Boolean, default: false }, // 是否隐藏
   disabled: { type: Boolean, default: false }, // 是否禁用
@@ -35,11 +35,6 @@ menuSchema.set('toJSON', {
   virtuals: true,
   transform: function (doc, ret) {
     ret.id = ret._id; // 添加自定义的 id 字段
-    if ([0, 1, 2].includes(ret.type)) {
-      ret.menuId = `menu_${ret._id}`; // 添加自定义的 authId 字段
-    } else if (ret.type === 4) {
-      ret.authId = `auth_${ret._id}`; // 添加自定义的 authId 字段
-    }
     delete ret._id; // 删除 _id 字段
   }
 });

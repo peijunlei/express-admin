@@ -18,7 +18,8 @@ exports.getAllRoles = catchAsync(async (req, res) => {
 })
 exports.createRole = factory.createOne(Role)
 exports.updateRole = factory.updateOne(Role)
-exports.getRole = factory.getOne(Role,[
-  // { path: 'menus',select: 'label id' }, // 填充权限
-])
+exports.getRole = catchAsync(async (req, res) => {
+  let role =await Role.findById(req.params.id).select('menus funcs')
+  res.success(role)
+})
 exports.deleteRole = factory.deleteOne(Role)

@@ -11,9 +11,13 @@ const Const = require('./constant');
 const AppError = require('./utils/app-error');
 const globalErrorHandler = require('./controllers/error-controller');
 const successResMiddleware = require('./middleware/success-response');
+const { useApiAuth } = require('./middleware/api-middleware');
 const userRouter = require('./routes/user');
 const menuRouter = require('./routes/menu');
 const roleRouter = require('./routes/role');
+const funcRouter = require('./routes/func');
+const apiRouter = require('./routes/api');
+const menuAuthRouter = require('./routes/menu-auth');
 // 安全中间件
 app.use(helmet());
 // 限制请求次数
@@ -34,6 +38,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(cors())
 
+
 // 处理成功响应
 app.use(successResMiddleware);
 
@@ -43,6 +48,13 @@ app.use('/api/v1/users', userRouter)
 app.use('/api/v1/menus', menuRouter)
 // 角色路由
 app.use('/api/v1/roles', roleRouter)
+// 功能路由
+app.use('/api/v1/funcs', funcRouter)
+// api路由
+app.use('/api/v1/apis', apiRouter)
+
+// 菜单权限路由
+app.use('/api/v1/menuAuth',menuAuthRouter )
 app.use('/api/v1/test', (req, res) => {
   res.json({
     message: 'test success deploy'

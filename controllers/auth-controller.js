@@ -73,7 +73,7 @@ exports.register = catchAsync(async (req, res) => {
 // 登录
 exports.login = catchAsync(async (req, res) => {
   //1.获取用户信息
-  const { password,email } = req.body
+  const { password, email } = req.body
   console.log('email', email)
   //2.判断用户是否存在 //3.判断密码是否正确
   const user = await User.findOne({ email }).select('+password')
