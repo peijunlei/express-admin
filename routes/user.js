@@ -1,36 +1,29 @@
 const express = require('express')
 const router = express.Router()
-const { getAllUsers, getUser, deleteUser, updateUser, addUser, excludeBody } = require('../controllers/user-controller')
-const { register, sendCode, registerByCode, login, forgetPassword, resetPassword, updatePassword } = require('../controllers/auth-controller')
-const { authGuard, restrictTo, isSelf, validatePermission } = require('../middleware/auth-middleware')
+const { getAllUsers, getUser, deleteUser, updateUser, addUser } = require('../controllers/user-controller')
+const { authGuard, isAdminOrSelf, hasRole } = require('../middleware/auth-middleware')
+const { excludeBody } = require('../utils/object-utils')
+const { ROLES } = require('../constant/roles')
 
+// 通用中间件
+router.use(authGuard)
 
+// 管理员路由
+router.route('/')
+  .get(hasRole(ROLES.ADMIN), getAllUsers)
+  .post(hasRole(ROLES.ADMIN), addUser)
 
-router
-  .post('/add', authGuard, addUser)
-  .post('/sendCode', sendCode)
-  .post('/registerByCode', registerByCode)
-  .post('/register', register)
-  .post('/login', login)
-  .post('/forgetPassword', forgetPassword)
-  .patch('/resetPassword/:token', resetPassword)
-  .patch('/updatePassword', authGuard, updatePassword)
+// 为 /:id 路径添加通用中间件
+// router.use('/:id', isAdminOrSelf)
 
-// need auth
-// router.use(authGuard)
-router
-  .route('/')
-  .get(authGuard, getAllUsers)
-router
-  .route('/:id')
-  .get(authGuard, isSelf, getUser)
+// 用户自身操作路由
+router.route('/:id')
+  .get(isAdminOrSelf,getUser)
   .put(
-    authGuard,
-    isSelf,
-    // req.body过滤掉role，password，passwordConfirm 三个字段
+    isAdminOrSelf,
     excludeBody('role', 'password', 'passwordConfirm'),
     updateUser
   )
-  .delete([authGuard], deleteUser)
+  .delete(hasRole(ROLES.ADMIN),deleteUser)
 
 module.exports = router

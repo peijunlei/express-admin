@@ -1,10 +1,9 @@
-
 const Const = require('../constant')
 const User = require('../models/User')
 const AppError = require('../utils/app-error')
 const catchAsync = require('../utils/catchAsync')
 const factory = require('./handlerFactory')
-
+const { excludeBody } = require('../utils/object-utils')
 
 exports.getAllUsers = factory.getAll(User)
 exports.getUser = factory.getOne(User)
@@ -22,17 +21,4 @@ exports.addUser = catchAsync(async (req, res) => {
   res.success(user)
 })
 
-exports.excludeBody = (...keys) => (req, res, next) => {
-  const body = excludeObj(req.body, ...keys)
-  req.body = body
-  next()
-}
-function excludeObj(obj, ...excludeKeys) {
-  const newObj = {}
-  Object.keys(obj).forEach(key => {
-    if (!excludeKeys.includes(key)) {
-      newObj[key] = obj[key]
-    }
-  })
-  return newObj
-}
+exports.excludeBody = excludeBody

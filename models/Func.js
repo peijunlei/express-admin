@@ -30,14 +30,5 @@ const funcSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-// 不暴露 __v _id 字段
-funcSchema.set('toJSON', {
-  versionKey: false,
-  virtuals: true,
-  transform: function (doc, ret) {
-    ret.id = ret._id; // 添加自定义的 id 字段
-    delete ret._id; // 删除 _id 字段
-  }
-});
 const Func = mongoose.model('Func', funcSchema);
 module.exports = Func;

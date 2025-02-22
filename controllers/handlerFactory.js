@@ -3,6 +3,7 @@ const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/app-error')
 const Const = require('../constant')
 const APIFeatures = require('../utils/api-features')
+const logger = require('../utils/logger')
 
 /**
  * 查询 delflag 为 0 即未删除的数据
@@ -17,6 +18,7 @@ exports.createOne = Model => catchAsync(async (req, res) => {
 exports.getAll = (Model, options) => catchAsync(async (req, res) => {
   console.log('common query===>', req.query)
   let filter = queryDelflag
+  console.log('filter===>', filter)
   const feature = new APIFeatures(Model.find(filter), req.query)
     .filter()
     .sort()

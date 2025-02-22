@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
  */
 const validator = require('validator');
 const { hashPassword } = require('../utils/bcrypt');
-const Const = require('../constant');
 
 const userSchema = new mongoose.Schema({
   phone: {
@@ -16,12 +15,6 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true, // 使得 null 值不会被重复 稀疏索引
     default: null,
-    validate: {
-      validator: function (val) {
-        return val?Const.PHONE_REG.test(val):true
-      },
-      message: '手机号格式不正确'
-    }
   },
   email: {
     type: String,
@@ -41,6 +34,15 @@ const userSchema = new mongoose.Schema({
     default: null,
   },
   roleIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }], // 用户的角色
+  /**
+   * 角色 admin, user, guest
+   */
+  role: {
+    type: String,
+    enum: ['admin', 'user', 'guest'],
+    default: 'user'
+  },
+
   password: {
     type: String,
     required: [true, '密码不能为空'],
@@ -67,31 +69,6 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
 })
-userSchema.set('toJSON', {
-  virtuals: true,
-  versionKey: false,
-  //  explain: 为了安全性，不返回 _id 和 password 字段
-  transform: function (doc, ret) {
-    delete ret._id
-    delete ret.password
-  }
-});
-// userSchema.alias('_id', 'id');
-// 虚拟属性 不是真正的数据库字段 不能用于查询
-// userSchema.virtual('id').get(function () {
-//   return this._id.toHexString();
-// })
-// 定义虚拟字段 roles
-// userSchema.virtual('roles', {
-//   ref: 'Role',
-//   localField: 'roleIds',
-//   foreignField: '_id',
-//   justOne: false, // 是否只填充单个文档
-//   options: { select: 'id name' }
-// });
-userSchema.pre(/^find/, async function (next) {
-  next()
-})
 // save 之前执行
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next()
@@ -99,10 +76,5 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined
   next()
 })
-// save 之后执行
-// userSchema.post('save', function (doc, next) {
-//   doc.password = undefined
-//   next()
-// })
 module.exports = mongoose.model('User', userSchema)
 

@@ -1,4 +1,3 @@
-
 /**
  * @description: APIFeatures class
  * @param {query} mongoose query  eg: User.find()
@@ -7,59 +6,53 @@
 class APIFeatures {
   constructor(query, queryString) {
     this.query = query
-    // 移除没有值的字段
-    const queryObj = Object.assign({}, queryString)
-    for (const key in queryObj) {
-      if (!queryObj[key]) delete queryObj[key]
+    try {
+      // 移除没有值的字段
+      const queryObj = Object.assign({}, queryString)
+      for (const key in queryObj) {
+        if (!queryObj[key] || queryObj[key].trim() === '') delete queryObj[key]
+      }
+      this.queryString = queryObj
+    } catch (error) {
+      throw new Error('查询参数格式错误')
     }
-    this.queryString = queryObj
   }
   filter() {
-    const queryObj = { ...this.queryString }
-    // const excludeFields = ['page','sort','limit','fields']
-    // excludeFields.forEach(el => delete queryObj[el])
-    // let queryStr = JSON.stringify(queryObj)
-    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g,match => `$${match}`)
+    try {
+      const queryObj = { ...this.queryString }
+      // 排除分页和排序相关的参数
+      const excludeFields = ['pageNum', 'pageSize', 'sort', 'createTime','updateTime']
+      excludeFields.forEach(field => delete queryObj[field])
 
-
-    // 构建模糊查询 { $regex: xxx, $options: 'i' }
-    for (const key in queryObj) {
-      if (!['pageNum', 'pageSize'].includes(key)) {
+      // 对剩余字段进行模糊查询
+      for (const key in queryObj) {
         queryObj[key] = { $regex: queryObj[key], $options: 'i' }
       }
+      this.query = this.query.find(queryObj)
+      return this
+    } catch (error) {
+      throw new Error('过滤参数处理失败')
     }
-    // console.log('queryObj===>', queryObj)
-    this.query = this.query.find(queryObj)
-    return this
   }
   sort() {
-    // if (this.queryString.sort) {
-    //   const sortBy = this.queryString.sort.split(',').join(' ')
-    //   this.query = this.query.sort(sortBy)
-    // } else {
-    //   this.query = this.query.sort('-createTime')
-    // }
     this.query = this.query.sort({ createTime: -1 })
-
     return this
 
   }
   limitFields() {
-    // if (this.queryString.fields) {
-    //   const fields = this.queryString.fields.split(',').join(' ')
-    //   this.query = this.query.select(fields)
-    // } else {
-    //   this.query = this.query.select('-__v')
-    // }
-    // this.query = this.query.select('-__v')
+    // 预留
     return this
   }
   paginate() {
-    const pageNum = parseInt(this.queryString.pageNum) || 1
-    const pageSize = parseInt(this.queryString.pageSize) || 10
-    const skip = (pageNum - 1) * pageSize
-    this.query = this.query.skip(skip).limit(pageSize)
-    return this
+    try {
+      const pageNum = Math.max(parseInt(this.queryString.pageNum) || 1, 1)
+      const pageSize = Math.min(Math.max(parseInt(this.queryString.pageSize) || 10, 1), 100)
+      const skip = (pageNum - 1) * pageSize
+      this.query = this.query.skip(skip).limit(pageSize)
+      return this
+    } catch (error) {
+      throw new Error('分页参数处理失败')
+    }
   }
 }
 
