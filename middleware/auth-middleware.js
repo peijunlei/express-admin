@@ -14,7 +14,7 @@ exports.authGuard = catchAsync(async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
-  console.log('token:', token)
+  // console.log('token:', token)
   if (!token) {
     return next(new AppError(Const.UNAUTHORIZED_MSG, Const.UNAUTHORIZED_CODE))
   }
@@ -31,6 +31,7 @@ exports.authGuard = catchAsync(async (req, res, next) => {
   }
 
   req.user = currentUser;
+  console.log('req.user:', req.user.email)  
   // // api接口权限验证
   // const { roleIds } = req.user
   // const roles = await Role.find({ _id: { $in: roleIds } }).select('funcs');

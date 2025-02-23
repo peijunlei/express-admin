@@ -3,15 +3,16 @@ const router = express.Router()
 const { getAllMenus, getPermissionMenus, getMenu, createMenu, updateMenu, deleteMenu,exchangeOrder } = require('../controllers/menu-controller')
 const { authGuard, validatePermission } = require('../middleware/auth-middleware')
 
-
+router.use(authGuard)
 router
   .route('/')
-  .get(authGuard, getAllMenus)
+  .get(getAllMenus)
   .post(createMenu)
-router.get('/permission', authGuard, getPermissionMenus)
+// 根据角色获取权限菜单
+router.get('/permission', getPermissionMenus)
 router
   .route('/:id')
-  .get(authGuard, getMenu)
+  .get(getMenu)
   .put(updateMenu)
   .delete(deleteMenu)
 router

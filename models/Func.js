@@ -20,7 +20,7 @@ const funcSchema = new mongoose.Schema({
     required: true,
     unique: true,
   }, // 功能编码
-  order: { type: Number, required: true }, // 排序
+  order: { type: Number, default: null }, // 排序
   createTime: {
     type: Date,
     default: Date.now,

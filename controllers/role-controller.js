@@ -1,7 +1,5 @@
 
-const Const = require('../constant')
 const Role = require('../models/Role')
-const AppError = require('../utils/app-error')
 const catchAsync = require('../utils/catchAsync')
 const factory = require('./handlerFactory')
 
@@ -18,8 +16,5 @@ exports.getAllRoles = catchAsync(async (req, res) => {
 })
 exports.createRole = factory.createOne(Role)
 exports.updateRole = factory.updateOne(Role)
-exports.getRole = catchAsync(async (req, res) => {
-  let role =await Role.findById(req.params.id).select('menus funcs')
-  res.success(role)
-})
+exports.getRole = factory.getOne(Role)
 exports.deleteRole = factory.deleteOne(Role)

@@ -16,17 +16,20 @@ exports.getMenu = factory.getOne(Menu)
 exports.deleteMenu = factory.delOneByFlag(Menu)
 exports.getPermissionMenus = catchAsync(async (req, res, next) => {
   const { roleIds } = req.user
-  // 查找多个角色的权限菜单
-  const roles = await Role.find({ _id: { $in: roleIds } }).populate('menus');
-
-  // 合并所有角色的菜单
-  const allMenus = roles.reduce((acc, role) => {
-    return acc.concat(role.menus);
-  }, []);
-  // 去重，防止重复菜单
-  const uniqueMenuIds = Array.from(new Set(allMenus.map(menu => menu._id)))
-  const uniqueMenus = uniqueMenuIds
-    .map(id => allMenus.find(menu => menu._id.equals(id)));
+  // 查找登录用户的所有角色
+  if (!roleIds?.length) {
+    return res.success({ list: [], total: 0 })
+  }
+  const roles = await Role.find(
+    { _id: { $in: roleIds } },
+    { menus: 1 }  // 只获取需要的字段
+  ).populate('menus');
+  // 使用 Set 对象直接存储 Menu 对象，避免二次查找
+  const uniqueMenus = [...new Set(
+    roles.flatMap(role => role.menus)
+      .filter(menu => menu) // 过滤掉可能的 null 值
+  )];
+  
   res.success({
     list: uniqueMenus,
     total: uniqueMenus.length

@@ -15,10 +15,10 @@ module.exports = (req, res, next) => {
       message,
     };
     // 记录响应日志
-    logger.info(`${req.method} ${req.originalUrl}`, {
-      statusCode,
-      response,
-    });
+    // logger.info(`${req.method} ${req.originalUrl}`, {
+    //   statusCode,
+    //   response,
+    // });
 
     res.status(statusCode).json(response);
   };
