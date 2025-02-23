@@ -1,4 +1,3 @@
-
 const Func = require('../models/Func')
 const Role = require('../models/Role')
 const catchAsync = require('../utils/catchAsync')
@@ -13,12 +12,32 @@ exports.deletefunc = factory.deleteOne(Func)
  */
 exports.getPermissionFuncs = catchAsync(async (req, res, next) => {
   const { roleIds } = req.user
-  const roles = await Role.find({ _id: { $in: roleIds } }).select('funcs');
-  // 合并所有角色的功能
-  const allFuncs = roles.reduce((acc, role) => {
-    return acc.concat(role.funcs);
-  }, []);
-  // 无需去重，因为功能是唯一的
-  const functionCodes = await Func.find({ _id: { $in: allFuncs } }).select('functionCode')
-  res.success(functionCodes.map(item => item.functionCode));
+  
+  // 添加预检查
+  if (!roleIds?.length) {
+    return res.success([]);
+  }
+
+  // 优化查询，只获取需要的字段
+  const roles = await Role.find(
+    { _id: { $in: roleIds } },
+    { funcs: 1 }
+  ).select('funcs');
+
+  // 使用 flatMap 简化数组操作
+  const allFuncs = roles
+    .flatMap(role => role.funcs)
+    .filter(Boolean); // 过滤掉可能的 null/undefined 值
+
+  if (!allFuncs.length) {
+    return res.success([]);
+  }
+
+  // 优化查询，只获取需要的字段
+  const functionCodes = await Func.find(
+    { _id: { $in: allFuncs } },
+    { functionCode: 1 }
+  ).lean(); // 使用 lean() 获取普通 JavaScript 对象，提高性能
+  const data = functionCodes.map(item => item.functionCode)
+  return res.success(data);
 })
