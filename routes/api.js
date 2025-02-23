@@ -7,16 +7,15 @@ const { authGuard } = require('../middleware/auth-middleware')
 
 
 // need auth
-// router.use(authGuard)
+router.use(authGuard)
 router
   .route('/')
   .post(addApi)
-  .get(authGuard, getAllApis)
+  .get(getAllApis)
 router
   .route('/:id')
-  .get(authGuard, getApi)
-  .put(
-    authGuard, updateApi)
-  .delete(authGuard, deleteApi)
+  .get(getApi)
+  .put(updateApi)
+  .delete(deleteApi)
 
 module.exports = router

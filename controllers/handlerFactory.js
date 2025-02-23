@@ -6,10 +6,13 @@ const APIFeatures = require('../utils/api-features')
 const logger = require('../utils/logger')
 
 /**
- * 查询 delflag 为 0 即未删除的数据
+ * 有delflag字段并查询 delflag 为 0 即未删除的数据,
  */
 const queryDelflag = {
-  delflag: 0
+  $or: [
+    { delflag: { $in: [0, false] } },
+    { delflag: { $exists: false } }  // 字段不存在也视为未删除
+  ]
 }
 exports.createOne = Model => catchAsync(async (req, res) => {
   const data = await Model.create({ ...req.body })
