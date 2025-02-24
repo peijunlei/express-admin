@@ -5,25 +5,22 @@ const { authGuard, isAdminOrSelf, hasRole } = require('../middleware/auth-middle
 const { excludeBody } = require('../utils/object-utils')
 const { ROLES } = require('../constant/roles')
 
-// 通用中间件
-router.use(authGuard)
 
 // 管理员路由
 router.route('/')
-  .get(hasRole(ROLES.ADMIN), getAllUsers)
-  .post(hasRole(ROLES.ADMIN), addUser)
+  .get(authGuard, hasRole(ROLES.ADMIN), getAllUsers)
+  .post(authGuard, hasRole(ROLES.ADMIN), addUser)
 
-// 为 /:id 路径添加通用中间件
-// router.use('/:id', isAdminOrSelf)
 
 // 用户自身操作路由
 router.route('/:id')
-  .get(isAdminOrSelf,getUser)
+  .get(authGuard, isAdminOrSelf, getUser)
   .put(
+    authGuard,
     isAdminOrSelf,
     excludeBody('role', 'password', 'passwordConfirm'),
     updateUser
   )
-  .delete(hasRole(ROLES.ADMIN),deleteUser)
+  .delete(authGuard, hasRole(ROLES.ADMIN), deleteUser)
 
 module.exports = router

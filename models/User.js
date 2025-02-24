@@ -1,6 +1,3 @@
-
-
-
 const mongoose = require('mongoose');
 
 /**
@@ -18,9 +15,25 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, '邮箱不能为空'],
-    unique: true,
-    validate: [validator.isEmail, '邮箱格式不正确']
+    required: [true, '请输入邮箱'],
+    validate: {
+      validator: async function(email) {
+        // 获取当前文档的 _id（如果存在）
+        const docId = this._id || this.getQuery?.()?._id;
+        console.log('docId',this._id);
+        
+        // 直接使用 mongoose.model 来查询
+        const User = mongoose.model('User');
+        const existingUser = await User.findOne({ 
+          email, 
+          delflag: 0,  // 明确指定只查找未删除的
+          _id: { $ne: docId }  // 排除自己
+        });
+        
+        return !existingUser;
+      },
+      message: '该邮箱已被使用'
+    }
   },
   delflag: {
     type: Number,
@@ -76,5 +89,16 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined
   next()
 })
-module.exports = mongoose.model('User', userSchema)
+
+userSchema.index(
+  { email: 1, delflag: 1 }, 
+  { 
+    unique: true,
+    partialFilterExpression: { delflag: 0 }
+  }
+);
+
+// 创建模型
+const User = mongoose.model('User', userSchema);
+module.exports = User;
 

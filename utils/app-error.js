@@ -2,7 +2,7 @@
 
 const Const = require("../constant");
 class AppError extends Error {
-  constructor(message = Const.FAIL_MSG, code = Const.FAIL_CODE, statusCode = 400) {
+  constructor(message = Const.FAIL_MSG, code = Const.FAIL_CODE, statusCode = 200) {
     super(message);
     this.errorCode = code;
     this.statusCode = statusCode;
