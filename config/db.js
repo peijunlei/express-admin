@@ -11,6 +11,17 @@ const connectDB = async () => {
       return ret;
     }
   });
+  // 设置虚拟字段
+  mongoose.set('toObject', {
+    virtuals: true,
+    versionKey: false,
+    transform: (doc, ret) => {
+      delete ret._id; 
+      delete ret.password;
+      return ret;
+    }
+  });
+  
   const dbOptions = {
     dbName: process.env.DB_NAME, // 数据库名称
     serverSelectionTimeoutMS: 5000, // 服务器选择超时时间（毫秒）

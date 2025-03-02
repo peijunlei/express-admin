@@ -30,5 +30,13 @@ const funcSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+// 返回虚拟字段 apis
+funcSchema.virtual('apis', {
+  ref: 'Api',
+  localField: 'apiIds',
+  foreignField: '_id',
+});
+
 const Func = mongoose.model('Func', funcSchema);
 module.exports = Func;

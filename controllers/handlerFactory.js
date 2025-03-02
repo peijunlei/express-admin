@@ -1,4 +1,3 @@
-
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/app-error')
 const Const = require('../constant')
@@ -18,11 +17,15 @@ exports.createOne = Model => catchAsync(async (req, res) => {
   const data = await Model.create({ ...req.body })
   res.success(data)
 })
-exports.getAll = (Model, options) => catchAsync(async (req, res) => {
+exports.getAll = (Model, options = {}) => catchAsync(async (req, res) => {
   console.log('common query===>', req.query)
   let filter = queryDelflag
   console.log('filter===>', filter)
-  const feature = new APIFeatures(Model.find(filter), req.query)
+  const feature = new APIFeatures(
+    Model.find(filter)
+      .populate(options.populates || []),
+    req.query
+  )
     .filter()
     .sort()
     .paginate()

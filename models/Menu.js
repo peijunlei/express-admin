@@ -17,9 +17,6 @@ const menuSchema = new mongoose.Schema({
   disabled: { type: Boolean, default: false }, // 是否禁用
   delflag: { type: Boolean, default: false }, // 是否删除
   newFeature: { type: Boolean, default: false }, // 是否是新功能
-  functionName: { type: String, default: null }, // 功能名称 type 为 3 时有效
-  authUrl: { type: String, default: null }, // 权限URL
-  authMethod: { type: String, default: null }, // 权限方法
   createTime: {
     type: Date,
     default: Date.now,

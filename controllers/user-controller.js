@@ -5,7 +5,12 @@ const catchAsync = require('../utils/catchAsync')
 const factory = require('./handlerFactory')
 const { excludeBody } = require('../utils/object-utils')
 
-exports.getAllUsers = factory.getAll(User)
+exports.getAllUsers = factory.getAll(User, {
+  populates: [{
+    path: 'roles',
+    select: 'name'
+  }]
+})
 exports.getUser = factory.getOne(User)
 exports.updateUser = factory.updateOne(User)
 exports.deleteUser = catchAsync(async (req, res) => {
@@ -17,7 +22,9 @@ exports.deleteUser = catchAsync(async (req, res) => {
 })
 // addUser
 exports.addUser = catchAsync(async (req, res) => {
-  const user = await User.create(req.body)
+  // 使用 save
+  const user = new User(req.body)
+  await user.save()
   res.success(user)
 })
 

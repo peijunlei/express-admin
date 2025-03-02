@@ -17,19 +17,21 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, '请输入邮箱'],
     validate: {
-      validator: async function(email) {
-        // 获取当前文档的 _id（如果存在）
-        const docId = this._id || this.getQuery?.()?._id;
-        console.log('docId',this._id);
-        
+      validator: async function (email) {
+        /**
+         * 在 save() 操作时（新建或更新文档）：this 指向文档实例，可以直接访问 this._id
+         * 在 findOneAndUpdate() 等查询操作时：this 指向查询对象，需要通过 this.getQuery() 来获取查询条件中的 _id
+         */
+        const docId = this._id || this.getQuery()._id;
+
         // 直接使用 mongoose.model 来查询
         const User = mongoose.model('User');
-        const existingUser = await User.findOne({ 
-          email, 
+        const existingUser = await User.findOne({
+          email,
           delflag: 0,  // 明确指定只查找未删除的
           _id: { $ne: docId }  // 排除自己
         });
-        
+
         return !existingUser;
       },
       message: '该邮箱已被使用'
@@ -37,9 +39,9 @@ const userSchema = new mongoose.Schema({
   },
   delflag: {
     type: Number,
-    enum:{
-      values: [0,1], // 0 未删除 1 已删除
-    },  
+    enum: {
+      values: [0, 1], // 0 未删除 1 已删除
+    },
     default: 0
   },
   age: {
@@ -91,12 +93,19 @@ userSchema.pre('save', async function (next) {
 })
 
 userSchema.index(
-  { email: 1, delflag: 1 }, 
-  { 
+  { email: 1, delflag: 1 },
+  {
     unique: true,
     partialFilterExpression: { delflag: 0 }
   }
 );
+
+// 在 userSchema 定义之后，创建模型之前添加
+userSchema.virtual('roles', {
+  ref: 'Role',           // 关联的模型
+  localField: 'roleIds', // 本地字段
+  foreignField: '_id'    // 关联模型的字段
+});
 
 // 创建模型
 const User = mongoose.model('User', userSchema);
