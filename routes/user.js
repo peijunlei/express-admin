@@ -8,8 +8,8 @@ const { ROLES } = require('../constant/roles')
 
 // 管理员路由
 router.route('/')
-  .get(authGuard, hasRole(ROLES.ADMIN), getAllUsers)
-  .post(authGuard, hasRole(ROLES.ADMIN), addUser)
+  .get(authGuard, getAllUsers)
+  .post(authGuard, addUser)
 
 
 // 用户自身操作路由

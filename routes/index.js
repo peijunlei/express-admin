@@ -7,8 +7,8 @@ const apiRouter = require('./api');//接口
 const menuAuthRouter = require('./menu-auth');//菜单权限
 const healthRouter = require('./health');//健康检查
 // API 版本前缀
-const API_PREFIX = '/api/v1';
-
+const API_PREFIX = process.env.API_PREFIX;
+console.log('API_PREFIX', API_PREFIX)
 const routes = [
   { path: '/auth', router: authRouter },
   { path: '/users', router: userRouter },

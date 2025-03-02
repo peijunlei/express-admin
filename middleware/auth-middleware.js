@@ -1,12 +1,9 @@
 const AppError = require("../utils/app-error");
 const Const = require("../constant");
 const catchAsync = require("../utils/catchAsync");
-const { verifyJwtToken, validateApiRequest } = require("../utils/jwt");
+const { verifyJwtToken } = require("../utils/jwt");
 const User = require("../models/User");
-const Role = require("../models/Role");
-const Menu = require("../models/Menu");
-const Func = require("../models/Func");
-const { UNAUTHORIZED_MSG, FORBIDDEN_MSG } = require('../constant');
+const validateApiAccess = require('./api-middleware');
 
 // auth
 exports.authGuard = catchAsync(async (req, res, next) => {
@@ -31,23 +28,16 @@ exports.authGuard = catchAsync(async (req, res, next) => {
   }
 
   req.user = currentUser;
-  console.log('req.user:', req.user.email)  
-  // // api接口权限验证
-  // const { roleIds } = req.user
-  // const roles = await Role.find({ _id: { $in: roleIds } }).select('funcs');
-  // // 合并所有角色的功能
-  // const allFuncIds = roles.reduce((acc, role) => {
-  //   return acc.concat(role.funcs);
-  // }, []);
-  // // 无需去重，因为功能是唯一的
-  // const allApis = await Func.find({ _id: { $in: allFuncIds } }).select('apiIds').populate('apiIds')
-  // const apiList = allApis.map(item => item.apiIds).flat()
-  // const isSupper = req.user._id.toString() === '666edd1707bc03656729fee7'
-  // const isMatch = validateApiRequest({ url: req.originalUrl.replace('/api/v1', ''), method: req.method }, apiList, isSupper).match
-  // console.log('isMatch:', isMatch)
-  // if (!isMatch) {
-  //   return next(new AppError(Const.FORBIDDEN_MSG, Const.FORBIDDEN_CODE));
-  // }
+  console.log('req.user:', req.user.email)
+  // 管理员直接放行
+  if (currentUser.role === 'admin') {
+    return next()
+  }
+  // 其他 调用 API 权限验证函数
+  const hasApiAccess = await validateApiAccess(currentUser, req);
+  if (!hasApiAccess) {
+    return next(new AppError(Const.FORBIDDEN_MSG, Const.FORBIDDEN_CODE));
+  }
   next();
 })
 
@@ -126,7 +116,7 @@ exports.isAdminOrSelf = async (req, res, next) => {
     const currentUser = req.user
 
     if (
-      currentUser.role === 'admin' || 
+      currentUser.role === 'admin' ||
       currentUser._id.toString() === userId
     ) {
       return next()

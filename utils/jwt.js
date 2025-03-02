@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const WHITE_LIST = require('../constant/white-list');
@@ -31,47 +30,38 @@ exports.createResetToken = () => {
   const resetPasswordExpire = Date.now() + 10 * 60 * 1000;
   return { resetPasswordToken, resetPasswordExpire }
 }
-function pathTemplateToRegex(template) {
-  // 处理查询参数部分
-  let regexString = template
-    .replace(/:[^\/?]+/g, '[^/]+')  // 替换动态部分
-    .replace(/\?/g, '\\?')           // 转义问号
-    .replace(/\//g, '\\/');          // 转义斜杠
-
-  // 处理查询参数的匹配
-  if (regexString.endsWith('\\?')) {
-    regexString += '.*';  // 查询参数部分可选，允许任意字符
-  }
-
-  return new RegExp(`^${regexString}$`);
-}
+const removeQueryParams = (url) => {
+  return url.split('?')[0];
+};
+// 添加路径匹配函数
+const isUrlMatch = (apiUrl, requestUrl) => {
+  // 将 API 路径转换为正则表达式模式
+  // 例如: /api/v1/apis/:id 转换为 /api/v1/apis/[^/]+
+  const pattern = apiUrl.replace(/\/:[^/]+/g, '/[^/]+');
+  const regExp = new RegExp(`^${pattern}$`);
+  // console.log('isUrlMatch', apiUrl, requestUrl)
+  // console.log(regExp.test(requestUrl))
+  return regExp.test(requestUrl);
+};
 // 定义函数来处理验证
-exports.validateApiRequest = (request, apiArray, isSupper) => {
-  console.log('request', request,apiArray)
-
-  const { url, method } = request;
-  if (WHITE_LIST.includes(url) || isSupper) {
-    return {
-      match: true,
-      message: `白名单: ${url}`
-    };
+exports.validateApiRequest = (request, apiArray) => {
+  // 使用 originalUrl 或 path 替代 url
+  const url = removeQueryParams(request.originalUrl || request.path);
+  const method = request.method;
+  if (WHITE_LIST.includes(url)) {
+    return true
   }
   // 遍历限定的 api 数组
   for (const api of apiArray) {
-    const apiUrl = api.apiUrl;
+    const apiUrl = `${process.env.API_PREFIX}${api.apiUrl}`;
     const apiMethod = api.method;
-    const regex = pathTemplateToRegex(apiUrl);
+    // console.log('api Url', apiUrl, 'api Method', apiMethod)
+    // console.log('req Url', url, 'req Method', method)
     // 判断 URL 和 Method 是否匹配
-    if (regex.test(url) && method.toUpperCase() === apiMethod.toUpperCase()) {
-      return {
-        match: true,
-        message: `请求匹配: ${api.apiName}`
-      };
+    if (isUrlMatch(apiUrl, url) && method.toUpperCase() === apiMethod.toUpperCase()) {
+      return true
     }
   }
   // 如果没有找到匹配项
-  return {
-    match: false,
-    message: "未找到匹配的 API"
-  };
+  return false
 }
