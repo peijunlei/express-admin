@@ -1,4 +1,3 @@
-
 const Const = require('../constant')
 const Menu = require('../models/Menu')
 const Role = require('../models/Role')
@@ -16,19 +15,34 @@ exports.getMenu = factory.getOne(Menu)
 exports.deleteMenu = factory.delOneByFlag(Menu)
 exports.getPermissionMenus = catchAsync(async (req, res, next) => {
   const { roleIds } = req.user
-  // 查找登录用户的所有角色
+  
   if (!roleIds?.length) {
     return res.success({ list: [], total: 0 })
   }
+
   const roles = await Role.find(
-    { _id: { $in: roleIds } },
-    { menus: 1 }  // 只获取需要的字段
-  ).populate('menus');
-  // 使用 Set 对象直接存储 Menu 对象，避免二次查找
-  const uniqueMenus = [...new Set(
-    roles.flatMap(role => role.menus)
-      .filter(menu => menu) // 过滤掉可能的 null 值
-  )];
+    { 
+      _id: { $in: roleIds },
+      disabled: false // 只查询未禁用的角色
+    },
+    { menus: 1 }
+  ).populate({
+    path: 'menus',
+    match: {
+      $or: [
+        { delflag: false },
+        { delflag: null }
+      ]
+    }
+  });
+
+  // 使用 Set 对象去重
+  const uniqueMenus = Array.from(
+    new Set(
+      roles.flatMap(role => role.menus)
+        .filter(menu => menu)
+    )
+  );
   
   res.success({
     list: uniqueMenus,
