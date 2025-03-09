@@ -7,17 +7,19 @@ const {
   login, 
   forgetPassword, 
   resetPassword, 
-  updatePassword 
+  updatePassword,
+  getUserByToken
 } = require('../controllers/auth-controller')
 const { authGuard } = require('../middleware/auth-middleware')
 
 router
+  .get('/getUserByToken/:token', getUserByToken)
   .post('/sendCode', sendCode)
   .post('/registerByCode', registerByCode)
   .post('/register', register)
   .post('/login', login)
   .post('/forgetPassword', forgetPassword)
-  .patch('/resetPassword/:token', resetPassword)
+  .post('/resetPassword/:token', resetPassword)
   .patch('/updatePassword', authGuard, updatePassword)
 
 module.exports = router 

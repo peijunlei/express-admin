@@ -158,9 +158,9 @@ exports.forgetPassword = catchAsync(async (req, res) => {
   user.resetPasswordExpire = resetPasswordExpire
   // 不验证user模型的验证器
   await user.save({ validateBeforeSave: false })
-
+  
   // 4.发送重置密码邮件
-  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetPasswordToken}`
+  const resetUrl = `${process.env.WEB_URL}/#/reset-password/${resetPasswordToken}`
   const message = `点击链接重置密码: ${resetUrl}，有效时间10分钟`
   try {
     await sendEmail({
@@ -198,3 +198,16 @@ exports.updatePassword = catchAsync(async (req, res) => {
   res.success(data, null)
 })
 
+/**
+ * 获取用户信息
+ */
+exports.getUserByToken = catchAsync(async (req, res) => {
+ //1. 获取tokenF
+ const token = req.params.token
+ //2. 根据token获取用户
+ const user = await User.findOne({ resetPasswordToken: token, resetPasswordExpire: { $gt: Date.now() } })
+ if (!user) {
+   throw new AppError(Const.TOKEN_INVALID, null, 401)
+ }
+ res.success(user)
+})
